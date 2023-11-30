@@ -35,10 +35,11 @@ class Move
 end
 
 class Player
-  attr_accessor :move, :name
+  attr_accessor :move, :name, :wins
 
   def initialize
     set_name
+    self.wins = 0
   end
 end
 
@@ -87,6 +88,7 @@ class RPSGame
 
   def display_welcome_message
     puts 'Welcome to Rock, Paper, Scissors!'
+    puts 'First one to ten wins is the grand winner!'
   end
 
   def display_goodbye_message
@@ -98,14 +100,27 @@ class RPSGame
     puts "#{computer.name} chose #{computer.move}"
   end
 
-  def display_winner
+  def winner
     if human.move > computer.move
-      puts "#{human.name} won!"
+      human
     elsif human.move < computer.move
-      puts "#{computer.name} won!"
-    else
-      puts "It's a tie!"
+      computer
     end
+  end
+
+  def display_winner
+    puts winner.nil? ? "It's a tie!" : "#{winner.name} won!"
+  end
+
+  def display_grand_winner
+    the_winner = [human, computer].find { |player| player.wins == 10 }
+    return unless the_winner
+    puts "#{the_winner.name} is the first one to 10 wins! Congragulations!"
+  end
+
+  def update_score
+    return unless winner
+    winner.wins += 1
   end
 
   def play_again?
@@ -118,6 +133,10 @@ class RPSGame
     answer == 'y'
   end
 
+  def grand_winner
+    [human, computer].any? { |player| player.wins == 10 }
+  end
+
   def play
     display_welcome_message
     loop do
@@ -125,8 +144,10 @@ class RPSGame
       computer.choose
       display_moves
       display_winner
-      break unless play_again?
+      update_score
+      break unless play_again? && grand_winner == false
     end
+    display_grand_winner
     display_goodbye_message
   end
 end
