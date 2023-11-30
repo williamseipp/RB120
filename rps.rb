@@ -1,38 +1,100 @@
+# I don't think creating separate classes of Move
+# is a good design decision for several reasons
+#
+# first, the type of move doesnt have any intrinsic value
+# on its own; its value is compared against another and that's it
+# if we were talk about say... a wizard duel and have two wizards
+# throw different classes of magic at each other then there might
+# be different attributes of a magic spell, such as cast time, or
+# lingering effects, or range, etc
+# these subclasses of Moves written as-is don't have a distinguishing
+# feature other than their type and the list of other moves they
+# beat.
+
+# second, its difficult to see what the win/lose conditions are for
+#   the entire set of moves. If we wanted to change them, or even
+#   describe them we'd have to look at multiple classes.
+#
+#   I could have kept the hashes for winning and losing combinations
+#   as part of the Move class but this would be redundant.
+#
+# third, I have to create another set of logic to create the particular
+#   "type" of Move for both the player and the computer. Ten lines of
+#   code for what? To substitute a custom class for a String?
+#   "Much ado about Nothing"
+#
+# the benefit is that the winning / losing combinations are gone
+# and the comparing methods #< and #> have shrunk by a little
+
 class Move
   attr_reader :value
 
   VALUES = ['rock', 'paper', 'scissors', 'lizard', 'spock']
-
-  WINNING_COMBINATIONS = {
-    'rock' => ['scissors', 'lizard'],
-    'paper' => ['rock', 'spock'],
-    'scissors' => ['paper', 'lizard'],
-    'lizard' => ['spock', 'paper'],
-    'spock' => ['rock', 'scissors']
-  }
-
-  LOSING_COMBINATIONS = {
-    'rock' => ['paper', 'spock'],
-    'paper' => ['scissors', 'lizard'],
-    'scissors' => ['rock', 'spock'],
-    'lizard' => ['rock', 'scissors'],
-    'spock' => ['paper', 'lizard']
-  }
 
   def initialize(value)
     @value = value
   end
 
   def >(other_move)
-    WINNING_COMBINATIONS[value].include?(other_move.value)
+    wins_against.include?(other_move.value)
   end
 
   def <(other_move)
-    LOSING_COMBINATIONS[value].include?(other_move.value)
+    loses_against.include?(other_move.value)
   end
 
   def to_s
     @value
+  end
+end
+
+class Rock < Move
+  def wins_against
+    ['scissors', 'lizard']
+  end
+
+  def loses_against
+    ['paper', 'spock']
+  end
+end
+
+class Paper < Move
+  def wins_against
+    ['rock', 'spock']
+  end
+
+  def loses_against
+    ['scissors', 'lizard']
+  end
+end
+
+class Scissors < Move
+  def wins_against
+    ['paper', 'lizard']
+  end
+
+  def loses_against
+    ['lizard', 'spock']
+  end
+end
+
+class Lizard < Move
+  def wins_against
+    ['paper', 'spock']
+  end
+
+  def loses_against
+    ['rock', 'scissors']
+  end
+end
+
+class Spock < Move
+  def wins_against
+    ['rock', 'scissors']
+  end
+
+  def loses_against
+    ['paper', 'lizard']
   end
 end
 
@@ -58,15 +120,22 @@ class Human < Player
     self.name = n
   end
 
-  def choose
-    choice = nil
+  def prompt_choice
     loop do
       puts 'Please choose rock, paper, scissors, lizard, or spock:'
       choice = gets.chomp
-      break if Move::VALUES.include? choice
+      return choice if Move::VALUES.include? choice
       puts 'Sorry, invalid choice.'
     end
-    self.move = Move.new(choice)
+  end
+
+  def choose
+    choice = prompt_choice
+    self.move = Rock.new(choice) if choice == 'rock'
+    self.move = Paper.new(choice) if choice == 'paper'
+    self.move = Scissors.new(choice) if choice == 'scissors'
+    self.move = Lizard.new(choice) if choice == 'lizard'
+    self.move = Spock.new(choice) if choice == 'spock'
   end
 end
 
@@ -76,7 +145,12 @@ class Computer < Player
   end
 
   def choose
-    self.move = Move.new(Move::VALUES.sample)
+    choice = (Move::VALUES.sample)
+    self.move = Rock.new(choice) if choice == 'rock'
+    self.move = Paper.new(choice) if choice == 'paper'
+    self.move = Scissors.new(choice) if choice == 'scissors'
+    self.move = Lizard.new(choice) if choice == 'lizard'
+    self.move = Spock.new(choice) if choice == 'spock'
   end
 end
 
