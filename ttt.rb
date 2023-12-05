@@ -142,6 +142,7 @@ class TTTGame
   FIRST_TO_MOVE = HUMAN_MARKER
 
   attr_reader :board, :human, :computer
+  attr_accessor :score
 
   Player = Struct.new('Player', :marker)
 
@@ -150,6 +151,7 @@ class TTTGame
     @human = Player.new(HUMAN_MARKER)
     @computer = Player.new(COMPUTER_MARKER)
     @current_marker = FIRST_TO_MOVE
+    @score = { "human" => 0, "computer" => 0 }
   end
 
   def player_move
@@ -164,11 +166,19 @@ class TTTGame
     loop do
       display_board
       player_move
+      update_score
       display_result
+      break if grand_winner
       break unless play_again?
       reset
       display_play_again_message
     end
+  end
+
+  def update_score
+    return unless board.winning_marker
+    winner = board.winning_marker == HUMAN_MARKER ? "human" : "computer"
+    score[winner] += 1
   end
 
   def play
@@ -182,6 +192,7 @@ class TTTGame
 
   def display_welcome_message
     puts "Welcome to Tic Tac Toe!"
+    puts "First to 5 wins is the grand winner!"
     puts ""
   end
 
@@ -215,7 +226,7 @@ class TTTGame
     end
   end
 
-  def human_moves                # array of integers   join returns String
+  def human_moves
     puts "Choose a square: #{joinor(board.unmarked_keys, ', ')} "
     square = nil
     loop do
@@ -252,12 +263,18 @@ class TTTGame
     else
       puts "It's a tie!"
     end
+    puts "--- human: #{score['human']}   computer: #{score['computer']} ---"
+    puts "#{grand_winner} is the grand winner!" if grand_winner
+  end
+
+  def grand_winner
+    score.key(2)
   end
 
   def play_again?
     answer = nil
     loop do
-      puts "Would you like to play again? (y/n)"
+      puts "Would you like to play another round? (y/n)"
       answer = gets.chomp.downcase
       break if %w(y n).include? answer
       puts "Sorry, must be y or n"
@@ -277,7 +294,7 @@ class TTTGame
   end
 
   def display_play_again_message
-    puts "Let's play again!"
+    puts "Let's play another round!"
     puts ""
   end
 end
