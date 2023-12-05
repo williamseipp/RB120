@@ -129,10 +129,11 @@ class Square
 end
 
 class Player
-  attr_accessor :marker
+  attr_accessor :marker, :name
 
   def initialize(marker)
     @marker = marker
+    @name = ""
   end
 end
 
@@ -150,6 +151,15 @@ class TTTGame
     @computer = Player.new(COMPUTER_MARKER)
     @current_marker = FIRST_TO_MOVE
     @score = { "human" => 0, "computer" => 0 }
+  end
+
+  def choose_name
+    puts "Choose a name for yourself: "
+    loop do
+      human.name = gets.chomp.to_s
+      break if human.name.size > 1
+      puts "Sorry, that's not a valid choice."
+    end
   end
 
   def player_move
@@ -202,6 +212,7 @@ class TTTGame
   def play
     clear
     display_welcome_message
+    choose_name
     change_marker if new_marker?
     main_game
     display_goodbye_message
