@@ -131,15 +131,16 @@ end
 class Player
   attr_accessor :marker, :name
 
-  def initialize(marker)
+  def initialize(marker, name = "")
     @marker = marker
-    @name = ""
+    @name = name
   end
 end
 
 class TTTGame
   HUMAN_MARKER = "X"
   COMPUTER_MARKER = "O"
+  COMPUTER_NAMES = %w(R2D2 HAL BENDER WALL-E TACHIKOMA GLADOS)
   FIRST_TO_MOVE = HUMAN_MARKER
 
   attr_reader :board, :human, :computer
@@ -148,7 +149,7 @@ class TTTGame
   def initialize
     @board = Board.new
     @human = Player.new(HUMAN_MARKER)
-    @computer = Player.new(COMPUTER_MARKER)
+    @computer = Player.new(COMPUTER_MARKER, COMPUTER_NAMES.sample)
     @current_marker = FIRST_TO_MOVE
     @score = { "human" => 0, "computer" => 0 }
   end
