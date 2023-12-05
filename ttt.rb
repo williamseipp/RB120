@@ -128,13 +128,13 @@ class Square
   end
 end
 
-# class Player
-#   attr_reader :marker
+class Player
+  attr_accessor :marker
 
-#   def initialize(marker)
-#     @marker = marker
-#   end
-# end
+  def initialize(marker)
+    @marker = marker
+  end
+end
 
 class TTTGame
   HUMAN_MARKER = "X"
@@ -143,8 +143,6 @@ class TTTGame
 
   attr_reader :board, :human, :computer
   attr_accessor :score
-
-  Player = Struct.new('Player', :marker)
 
   def initialize
     @board = Board.new
@@ -181,9 +179,30 @@ class TTTGame
     score[winner] += 1
   end
 
+  def new_marker?
+    answer = nil
+    loop do
+      puts "Would you like to change your marker to something else? (y/n)"
+      answer = gets.chomp.downcase
+      break if %w(y n).include? answer
+      puts "Sorry, must be y or n"
+    end
+    answer == 'y'
+  end
+
+  def change_marker
+    puts "Choose a new marker for yourself: "
+    loop do
+      human.marker = gets.chomp.to_s
+      break if human.marker.size == 1
+      puts "Sorry, that's not a valid choice."
+    end
+  end
+
   def play
     clear
     display_welcome_message
+    change_marker if new_marker?
     main_game
     display_goodbye_message
   end
