@@ -161,6 +161,7 @@ class TTTGame
       break if human.name.size > 1
       puts "Sorry, that's not a valid choice."
     end
+    puts "Nice to meet you #{human.name}"
   end
 
   def player_move
@@ -241,7 +242,7 @@ class TTTGame
   end
 
   def display_board
-    puts "You're a #{human.marker}. Computer is a #{computer.marker}."
+    puts "#{human.name} is #{human.marker}. #{computer.name} is #{computer.marker}."
     puts ""
     board.draw
     puts ""
@@ -288,18 +289,19 @@ class TTTGame
 
     case board.winning_marker
     when human.marker
-      puts "You won!"
+      puts "#{human.name} won!"
     when computer.marker
-      puts "Computer won!"
+      puts "#{computer.name} won!"
     else
       puts "It's a tie!"
     end
-    puts "--- human: #{score['human']}   computer: #{score['computer']} ---"
+    puts "--- #{human.name}: #{score['human']}   #{computer.name}: #{score['computer']} ---"
     puts "#{grand_winner} is the grand winner!" if grand_winner
   end
 
   def grand_winner
-    score.key(2)
+    return if score.key(2).nil?
+    score.key(2) == "human" ? "#{human.name}" : "#{computer.name}"
   end
 
   def play_again?
