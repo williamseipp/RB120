@@ -205,8 +205,18 @@ class TTTGame
     puts ""
   end
 
+  def joinor(numbers, delimiter = ', ', word = 'or')
+    case numbers.size
+    when 0 then ''
+    when 1 then numbers.first
+    when 2 then "#{numbers.first} #{word} #{numbers.last}"
+    else
+      "#{numbers[0..-2].join(delimiter)}#{delimiter}#{word} #{numbers.last}"
+    end
+  end
+
   def human_moves                # array of integers   join returns String
-    puts "Choose a square (#{board.unmarked_keys.join(', ')}): "
+    puts "Choose a square: #{joinor(board.unmarked_keys, ', ')} "
     square = nil
     loop do
       square = gets.chomp.to_i
